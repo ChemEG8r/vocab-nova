@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vocab Nova</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+  :root {
+    --bg: #F4F5FD;
+    --grid: rgba(79, 70, 229, 0.06);
+    --surface: #FFFFFF;
+    --ink: #1C1D33;
+    --muted: #63657F;
+    --accent: #4F46E5;
+    --accent-soft: rgba(79, 70, 229, 0.11);
+    --on-accent: #FFFFFF;
+    --good: #1E8A4C;
+    --good-soft: rgba(30, 138, 76, 0.12);
+    --bad: #D23B3B;
+    --bad-soft: rgba(210, 59, 59, 0.10);
+    --line: #DEE0F2;
+    --shadow: 0 2px 10px rgba(28, 29, 51, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1020;
+      --grid: rgba(139, 147, 248, 0.055);
+      --surface: #181A30;
+      --ink: #E8E9F6;
+      --muted: #9CA0BE;
+      --accent: #8B93F8;
+      --accent-soft: rgba(139, 147, 248, 0.16);
+      --on-accent: #0F1020;
+      --good: #4CC97E;
+      --good-soft: rgba(76, 201, 126, 0.14);
+      --bad: #F07A7A;
+      --bad-soft: rgba(240, 122, 122, 0.13);
+      --line: #272A48;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1020;
+    --grid: rgba(139, 147, 248, 0.055);
+    --surface: #181A30;
+    --ink: #E8E9F6;
+    --muted: #9CA0BE;
+    --accent: #8B93F8;
+    --accent-soft: rgba(139, 147, 248, 0.16);
+    --on-accent: #0F1020;
+    --good: #4CC97E;
+    --good-soft: rgba(76, 201, 126, 0.14);
+    --bad: #F07A7A;
+    --bad-soft: rgba(240, 122, 122, 0.13);
+    --line: #272A48;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      var(--bg);
+    background-size: 28px 28px, 28px 28px, auto;
+    font-family: "Atkinson Hyperlegible", "Avenir Next", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 18px 14px 48px; }
+
+  h1, h2, h3 { font-family: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif; text-wrap: balance; margin: 0; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+  .topbar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 2px 14px; }
+  .brand { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.01em; }
+  .brand span { color: var(--accent); }
+  .navlink {
+    background: none; border: none; padding: 4px 2px; cursor: pointer;
+    color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px;
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); padding: 20px 18px; margin-bottom: 14px; }
+
+  .hero h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.15; }
+  .hero p { color: var(--muted); margin: 10px 0 0; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; text-align: center;
+    font: inherit; font-weight: 700; cursor: pointer;
+    border-radius: 12px; padding: 13px 20px; min-height: 52px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    touch-action: manipulation;
+  }
+  .btn:focus-visible, .navlink:focus-visible, input:focus-visible, details summary:focus-visible, .opt:focus-visible {
+    outline: 3px solid var(--accent); outline-offset: 2px;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-size: 17px; }
+  .btn-wide { width: 100%; }
+  .btn-danger { color: var(--bad); }
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-row .btn { flex: 1; }
+  .btn small { display: block; font-weight: 400; font-size: 12.5px; opacity: 0.85; }
+  .btn .stack { display: block; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 13px; }
+  .stat .num { font-family: "IBM Plex Mono", monospace; font-size: 23px; font-weight: 600; }
+  .stat .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+
+  /* ---------- Quiz ---------- */
+  .progress { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 8px 0 10px; }
+  .progress .label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  .bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.25s ease; }
+  @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+
+  .qtopic { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 8px; }
+  .qterm { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 30px; font-weight: 800; letter-spacing: -0.01em; margin: 2px 0 4px; }
+  .qtext { font-size: 17.5px; margin: 0 0 6px; }
+  .qsub { font-weight: 700; font-size: 15px; color: var(--muted); margin: 0 0 12px; }
+
+  .opts { display: flex; flex-direction: column; gap: 9px; }
+  .opt {
+    font: inherit; font-size: 15.5px; font-weight: 700; text-align: left; cursor: pointer;
+    border: 2px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink);
+    padding: 13px 14px; min-height: 52px; touch-action: manipulation;
+  }
+  .opt.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .opt:disabled { cursor: default; opacity: 1; }
+  .opt.dim:disabled { opacity: 0.55; }
+
+  .answer-line { display: flex; gap: 8px; align-items: center; }
+  input.answer {
+    flex: 1; width: 100%; min-height: 54px; padding: 8px 14px;
+    font-family: "IBM Plex Mono", monospace; font-size: 20px; font-weight: 600;
+    color: var(--ink); background: var(--surface);
+    border: 2px solid var(--line); border-radius: 12px;
+  }
+  input.answer::placeholder { color: var(--muted); opacity: 0.6; font-weight: 500; font-size: 15px; font-family: "Atkinson Hyperlegible", sans-serif; }
+  .answer-line .btn { flex: 0 0 auto; }
+
+  .feedback { min-height: 46px; border-radius: 10px; padding: 10px 12px; font-size: 15px; margin-top: 12px; }
+  .feedback.neutral { color: var(--muted); background: var(--surface); border: 1px dashed var(--line); }
+  .feedback.right { color: var(--good); background: var(--good-soft); font-weight: 700; }
+  .feedback.wrong { color: var(--bad); background: var(--bad-soft); font-weight: 700; }
+  .feedback .why { display: block; font-weight: 400; color: var(--ink); margin-top: 4px; }
+
+  /* ---------- Results / history / study ---------- */
+  .score-hero { text-align: center; padding: 26px 18px; }
+  .score-big { font-family: "IBM Plex Mono", monospace; font-size: 54px; font-weight: 600; line-height: 1; }
+  .score-msg { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 22px; font-weight: 800; margin-top: 10px; }
+  .score-sub { color: var(--muted); margin-top: 4px; }
+
+  .misslist { margin: 0; padding: 0; list-style: none; }
+  .misslist li { padding: 10px 4px; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .misslist li:last-child { border-bottom: none; }
+  .misslist .q { font-weight: 700; display: block; }
+  .misslist .a { color: var(--bad); font-family: "IBM Plex Mono", monospace; }
+  .misslist .cor { color: var(--good); font-weight: 700; }
+  .allgood { color: var(--good); font-weight: 700; padding: 10px 4px; }
+
+  .hrow { border-bottom: 1px solid var(--line); }
+  .hrow:last-child { border-bottom: none; }
+  .hrow summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 4px; cursor: pointer; list-style: none; }
+  .hrow summary::-webkit-details-marker { display: none; }
+  .hdate { font-size: 15px; flex: 1; }
+  .hdate small { display: block; color: var(--muted); }
+  .hscope { font-size: 12px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 9px; }
+  .hscore { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 14px; color: var(--muted); }
+  .hpct { font-family: "IBM Plex Mono", monospace; font-weight: 600; border-radius: 999px; padding: 4px 11px; font-size: 14px; }
+  .pct-good { color: var(--good); background: var(--good-soft); }
+  .pct-mid  { color: var(--accent); background: var(--accent-soft); }
+  .pct-low  { color: var(--bad); background: var(--bad-soft); }
+  .hdetail { padding: 0 4px 12px; }
+
+  .trouble .tlabel { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .trouble .tlabel .mono { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .tbar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; margin-bottom: 9px; }
+  .tbar > div { height: 100%; border-radius: 999px; background: var(--bad); }
+
+  .study h3 { font-size: 17px; margin: 18px 0 8px; color: var(--accent); }
+  .study h3:first-of-type { margin-top: 0; }
+  .word { border: 1px solid var(--line); border-radius: 12px; padding: 11px 13px; margin-bottom: 9px; background: var(--surface); }
+  .word .wt { font-weight: 800; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 17px; }
+  .word .wd { margin: 3px 0 0; font-size: 15.5px; }
+  .word .wn { margin: 5px 0 0; font-size: 13.5px; color: var(--muted); }
+  .word .wn b { color: var(--accent); }
+
+  .empty { color: var(--muted); text-align: center; padding: 26px 10px; }
+  .footnote { color: var(--muted); font-size: 13px; text-align: center; margin-top: 18px; }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">Vocab <span>Nova</span></div>
+    <button class="navlink" id="navBtn"></button>
+  </div>
+  <div id="app"></div>
+</div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+"use strict";
+
+/* ================= helpers ================= */
+const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const pick = arr => arr[rnd(0, arr.length - 1)];
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/* typed-answer matching: normalize + Damerau-Levenshtein typo tolerance */
+const norm = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]/g, "");
+function dlev(a, b) {
+  const m = a.length, n = b.length;
+  if (Math.abs(m - n) > 3) return 99;
+  const d = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0));
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[m][n];
+}
+function matchesTerm(user, term) {
+  const u = norm(user);
+  if (!u) return false;
+  const targets = [term.t, ...(term.a || [])].map(norm);
+  for (const t of targets) {
+    if (u === t) return true;
+    const allow = t.length >= 8 ? 2 : t.length >= 4 ? 1 : 0;
+    if (allow && dlev(u, t) <= allow) return true;
+  }
+  return false;
+}
+
+/* ================= the words (VJ's Ch 10 vocab sheet) ================= */
+const SECTIONS = [
+  { id: 1, name: "Section 1 — The solar system", terms: [
+    { t: "Solar system", a: ["the solar system"],
+      d: "The Sun, the planets, their moons, and other objects that orbit the Sun.",
+      n: "Everything that orbits our one star — eight planets plus all the leftovers." },
+    { t: "Astronomical unit", a: ["au", "astronomical units"],
+      d: "The average distance between Earth and the Sun — about 150 million km. The ruler for solar-system distances.",
+      n: "It's a DISTANCE, not a time. Earth to Sun = 1 AU." },
+    { t: "Sun", a: [],
+      d: "The gaseous body at the center of the solar system — much larger than anything else in it.",
+      n: "A star made of gas — it holds almost all the solar system's mass." },
+    { t: "Planet", a: ["planets"],
+      d: "A body that is round, orbits the Sun, and has cleared its orbit of other objects.",
+      n: "Three checks: round · orbits the Sun · cleared its orbit." },
+    { t: "Moon", a: ["moons", "natural satellite"],
+      d: "A natural satellite — a body that orbits a planet.",
+      n: "What makes it a moon is orbiting a PLANET, not just being in orbit." },
+    { t: "Asteroid", a: ["asteroids"],
+      d: "Small, mostly rocky bodies — many are found in the asteroid belt or the Kuiper belt.",
+      n: "Rocky leftovers. Most live in the asteroid belt." },
+    { t: "Meteoroid", a: ["meteoroids"],
+      d: "A chunk of rock or dust smaller than an asteroid.",
+      n: "Meteor-OID = the small stuff. Smaller than an asteroid." },
+    { t: "Comet", a: ["comets"],
+      d: "A loose ball of ice and rock with a long, narrow orbit.",
+      n: "A dirty snowball on a long, stretched-out orbit." },
+  ]},
+  { id: 2, name: "Section 2 — The Sun", terms: [
+    { t: "Photosphere", a: [],
+      d: "The inner layer of the Sun's atmosphere — the bright part of the Sun we actually see.",
+      n: "'Photo' = light. It's the layer you SEE." },
+    { t: "Chromosphere", a: [],
+      d: "The middle layer of the Sun's atmosphere.",
+      n: "The MIDDLE layer — photosphere below, corona above." },
+    { t: "Corona", a: [],
+      d: "The outer layer of the Sun's atmosphere — the white halo you can see during an eclipse.",
+      n: "'Corona' means crown — the white halo around an eclipse." },
+    { t: "Solar wind", a: ["solar winds"],
+      d: "Streams of electrically charged particles that flow out from the corona.",
+      n: "Charged particles streaming OUT of the corona, into space." },
+    { t: "Sunspots", a: ["sunspot", "sun spots"],
+      d: "Areas of plasma on the Sun that are cooler than the plasma around them — they often occur in pairs.",
+      n: "Cooler = darker. And they come in PAIRS." },
+    { t: "Prominence", a: ["prominences", "solar prominence"],
+      d: "A huge loop of plasma that arches off the Sun's surface, often anchored at a pair of sunspots.",
+      n: "The plasma LOOP itself — it often arches between a sunspot pair." },
+    { t: "Solar flare", a: ["solar flares"],
+      d: "An eruption on the Sun — energy heats plasma to millions of degrees and it bursts out into space.",
+      n: "A sudden ERUPTION of super-heated plasma." },
+  ]},
+  { id: 3, name: "Section 3 — Light & energy", terms: [
+    { t: "Electromagnetic radiation", a: ["em radiation", "electromagnetic waves", "em waves"],
+      d: "Energy that objects give off, traveling through space as waves — light is one kind.",
+      n: "The energy itself, traveling as waves. ALL objects in space emit some." },
+    { t: "Visible light", a: [],
+      d: "Light you can see — the part of the spectrum human eyes can detect.",
+      n: "The tiny slice of EM radiation your eyes can detect." },
+    { t: "Spectrum", a: [],
+      d: "Light separated into its different colors — each color has a different wavelength.",
+      n: "Light fanned out into its colors, sorted by wavelength." },
+  ]},
+];
+const ALL_TERMS = SECTIONS.flatMap(s => s.terms);
+
+/* ================= quiz builder =================
+   Every word in the chosen scope is asked TWICE per round:
+   once as multiple choice (term→definition or definition→term),
+   once typed (definition → type the term). */
+function distractors(term, fmt, secTerms) {
+  let pool = secTerms.filter(x => x !== term);
+  if (pool.length < 3) pool = pool.concat(ALL_TERMS.filter(x => x !== term && !pool.includes(x)));
+  return shuffle(pool).slice(0, 3).map(fmt);
+}
+function mkMC(sec, term) {
+  const label = `S${sec.id}: ${term.t}`;
+  if (Math.random() < 0.5) {
+    return { kind: "mc", sid: sec.id, term: term.t, qterm: term.t, qsub: "Which definition matches?",
+      o: [term.d, ...distractors(term, x => x.d, sec.terms)],
+      why: term.n, missLabel: label, ansText: term.d };
+  }
+  return { kind: "mc", sid: sec.id, term: term.t, qtext: term.d, qsub: "Which term is this?",
+    o: [term.t, ...distractors(term, x => x.t, sec.terms)],
+    why: term.n, missLabel: label, ansText: term.t };
+}
+function mkTyped(sec, term) {
+  return { kind: "typed", sid: sec.id, term: term.t, qtext: term.d, qsub: "Type the term:",
+    tm: term, why: term.n, missLabel: `S${sec.id}: ${term.t}`, ansText: term.t };
+}
+function buildQuiz(scope) {
+  const qs = [];
+  for (const sec of SECTIONS) {
+    if (!scope.includes(sec.id)) continue;
+    for (const term of sec.terms) { qs.push(mkMC(sec, term)); qs.push(mkTyped(sec, term)); }
+  }
+  return shuffle(qs);
+}
+const SCOPES = {
+  s1: { ids: [1], label: "Section 1" },
+  s2: { ids: [2], label: "Section 2" },
+  s3: { ids: [3], label: "Section 3" },
+  all: { ids: [1, 2, 3], label: "All sections" },
+};
+function scopeFromTotal(total) {
+  if (total === 16) return "S1";
+  if (total === 14) return "S2";
+  if (total === 6) return "S3";
+  if (total === 36) return "All";
+  return "";
+}
+
+/* ================= storage (same pattern as the other apps) ================= */
+const KEY = "vocab-nova-history";
+const API = "/api/scores";
+let apiSynced = false;
+
+function loadLocal() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; }
+}
+function saveLocal(h) {
+  try { localStorage.setItem(KEY, JSON.stringify(h)); } catch {}
+}
+function loadHistory() { return loadLocal(); }
+function postRecord(rec) {
+  return fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
+}
+function addRecord(rec) {
+  const h = loadLocal(); h.push(rec); saveLocal(h);
+  postRecord(rec).catch(() => {});
+}
+function clearHistory() {
+  saveLocal([]);
+  if (apiSynced) fetch(API, { method: "DELETE" }).catch(() => {});
+}
+async function syncApi() {
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error();
+    const server = await res.json();
+    if (!Array.isArray(server)) throw new Error();
+    const seen = new Set(server.map(r => r.id || r.date));
+    const missing = loadLocal().filter(r => !seen.has(r.id || r.date));
+    for (const r of missing) { try { await postRecord(r); } catch {} }
+    const merged = server.concat(missing).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    saveLocal(merged);
+    apiSynced = true;
+    if (state.screen === "home" || state.screen === "history") render();
+  } catch { apiSynced = false; }
+}
+
+/* ================= state ================= */
+const app = document.getElementById("app");
+const navBtn = document.getElementById("navBtn");
+let state = { screen: "home", quiz: [], idx: 0, right: 0, misses: [], locked: false, scopeLabel: "" };
+let timers = [];
+function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+function go(screen) {
+  clearTimers();
+  state.screen = screen;
+  if (screen === "home" || screen === "history") syncApi();
+  render();
+  window.scrollTo(0, 0);
+}
+
+navBtn.addEventListener("click", () => {
+  if (state.screen === "quiz") {
+    if (confirm("Quit this quiz? It won't be scored.")) go("home");
+  } else if (state.screen === "home") {
+    go("history");
+  } else {
+    go("home");
+  }
+});
+
+function pctClass(p) { return p >= 90 ? "pct-good" : p >= 70 ? "pct-mid" : "pct-low"; }
+
+function startQuiz(scopeKey) {
+  const sc = SCOPES[scopeKey];
+  state.quiz = buildQuiz(sc.ids);
+  state.scopeLabel = sc.label;
+  state.idx = 0;
+  state.right = 0;
+  state.misses = [];
+  go("quiz");
+}
+
+function render() {
+  navBtn.textContent = state.screen === "quiz" ? "Quit" : state.screen === "home" ? "History" : "Home";
+  if (state.screen === "home") renderHome();
+  else if (state.screen === "quiz") renderQuiz();
+  else if (state.screen === "results") renderResults();
+  else if (state.screen === "study") renderStudy();
+  else renderHistory();
+}
+
+function renderHome() {
+  const h = loadHistory();
+  const best = h.length ? Math.max(...h.map(r => r.percent)) : null;
+  const avg = h.length ? Math.round(h.reduce((a, r) => a + r.percent, 0) / h.length) : null;
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>Know the words, VJ.</h1>
+      <p>Chapter 10 vocabulary. Every word gets asked <b>two ways</b> each round — spot the definition, then type the term from memory. Pick your section:</p>
+      <div class="btn-row"><button class="btn btn-primary btn-wide" data-scope="s2"><span class="stack">Section 2 — The Sun<small>this week's test · 7 words · 14 questions</small></span></button></div>
+      <div class="btn-row">
+        <button class="btn" data-scope="s1"><span class="stack">Section 1<small>solar system · 8 words</small></span></button>
+        <button class="btn" data-scope="s3"><span class="stack">Section 3<small>light &amp; energy · 3 words</small></span></button>
+      </div>
+      <div class="btn-row"><button class="btn btn-wide" data-scope="all"><span class="stack">Everything<small>all 18 words · 36 questions</small></span></button></div>
+      <div class="btn-row"><button class="btn btn-wide" id="studyBtn">Read the word list</button></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num mono">${h.length}</div><div class="lbl">Rounds</div></div>
+      <div class="stat"><div class="num mono">${best === null ? "–" : best + "%"}</div><div class="lbl">Best</div></div>
+      <div class="stat"><div class="num mono">${avg === null ? "–" : avg + "%"}</div><div class="lbl">Average</div></div>
+    </div>`;
+  app.querySelectorAll("[data-scope]").forEach(b => b.addEventListener("click", () => startQuiz(b.dataset.scope)));
+  document.getElementById("studyBtn").addEventListener("click", () => go("study"));
+}
+
+function advance() {
+  clearTimers();
+  state.idx++;
+  if (state.idx >= state.quiz.length) finishQuiz();
+  else render();
+}
+
+function renderQuiz() {
+  const q = state.quiz[state.idx];
+  const n = state.quiz.length;
+  const secName = SECTIONS.find(s => s.id === q.sid).name;
+
+  let answerHTML;
+  let opts = [];
+  if (q.kind === "mc") {
+    opts = shuffle(q.o.map((text, i) => ({ text, correct: i === 0 })));
+    answerHTML = `<div class="opts">${opts.map((o, i) =>
+      `<button class="opt" data-i="${i}">${esc(o.text)}</button>`).join("")}</div>`;
+  } else {
+    answerHTML = `<div class="answer-line">
+        <input class="answer" id="ansInput" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type the term" aria-label="type the term">
+        <button class="btn btn-primary" id="checkBtn">Check</button>
+      </div>`;
+  }
+
+  app.innerHTML = `
+    <div class="progress">
+      <div class="label"><span>Word ${state.idx + 1} of ${n}</span><span>${esc(state.scopeLabel)}</span></div>
+      <div class="bar"><div style="width:${((state.idx + 1) / n) * 100}%"></div></div>
+    </div>
+    <div class="card">
+      <div class="qtopic">${esc(secName)}</div>
+      ${q.qterm ? `<div class="qterm">${esc(q.qterm)}</div>` : `<p class="qtext">“${esc(q.qtext)}”</p>`}
+      <p class="qsub">${esc(q.qsub)}</p>
+      ${answerHTML}
+      <div class="feedback neutral" id="feedback">${q.kind === "mc" ? "Tap the best answer." : "Spelling doesn't have to be perfect — close counts."}</div>
+    </div>`;
+
+  const feedback = document.getElementById("feedback");
+  const miss = aShown => state.misses.push({ q: q.missLabel, a: aShown, c: q.ansText });
+
+  if (q.kind === "mc") {
+    const showWhy = ok => {
+      feedback.className = "feedback " + (ok ? "right" : "wrong");
+      feedback.innerHTML = (ok ? "Correct! ✓" : `Not quite — the answer is <b>${esc(q.ansText)}</b>.`) +
+        `<span class="why">${esc(q.why)}</span>` +
+        (ok ? "" : ` <button class="navlink" id="nextBtn">Next →</button>`);
+      if (!ok) document.getElementById("nextBtn").addEventListener("click", advance);
+    };
+    app.querySelectorAll(".opt").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (state.locked) return;
+        state.locked = true;
+        const chosen = opts[Number(btn.dataset.i)];
+        app.querySelectorAll(".opt").forEach((b, i) => {
+          b.disabled = true;
+          if (opts[i].correct) b.classList.add("right");
+          else if (b === btn) b.classList.add("wrong");
+          else b.classList.add("dim");
+        });
+        if (chosen.correct) {
+          state.right++;
+          showWhy(true);
+          later(() => { state.locked = false; advance(); }, 1600);
+        } else {
+          miss(chosen.text);
+          showWhy(false);
+          state.locked = false;
+        }
+      });
+    });
+  } else {
+    const input = document.getElementById("ansInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const submit = () => {
+      if (state.locked) return;
+      const raw = input.value.trim();
+      if (!raw) { input.focus(); return; }
+      state.locked = true;
+      input.disabled = checkBtn.disabled = true;
+      if (matchesTerm(raw, q.tm)) {
+        state.right++;
+        feedback.className = "feedback right";
+        feedback.innerHTML = `Correct! ✓ <b>${esc(q.ansText)}</b><span class="why">${esc(q.why)}</span>
+          <button class="navlink" id="nextBtn2" style="float:right">Next →</button>`;
+        document.getElementById("nextBtn2").addEventListener("click", advance);
+        later(() => { if (state.quiz[state.idx] === q) { state.locked = false; advance(); } }, 2000);
+      } else {
+        miss(raw);
+        feedback.className = "feedback wrong";
+        feedback.innerHTML = `Not quite — it's <b>${esc(q.ansText)}</b>.<span class="why">${esc(q.why)}</span>
+          <button class="navlink" id="nextBtn">Next →</button>`;
+        document.getElementById("nextBtn").addEventListener("click", advance);
+      }
+    };
+    checkBtn.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+  }
+  state.locked = false;
+}
+
+function finishQuiz() {
+  clearTimers();
+  const total = state.quiz.length;
+  const percent = Math.round((state.right / total) * 100);
+  const rec = {
+    id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+    date: new Date().toISOString(),
+    right: state.right, total, percent,
+    misses: state.misses.map(m => ({ q: String(m.q).slice(0, 190), a: String(m.a).slice(0, 70), c: String(m.c).slice(0, 110) })),
+  };
+  addRecord(rec);
+  state.lastResult = rec;
+  go("results");
+}
+
+function missListHTML(misses) {
+  return misses.length
+    ? `<ul class="misslist">${misses.map(m =>
+        `<li><span class="q">${esc(m.q)}</span>
+         <span class="a">${esc(m.a)}</span> → <span class="cor">${esc(m.c)}</span></li>`).join("")}</ul>`
+    : `<div class="allgood">Nothing missed — a flawless round!</div>`;
+}
+
+function renderResults() {
+  const r = state.lastResult;
+  const msg = r.percent === 100 ? "Perfect — every word nailed! \u{1F31F}"
+    : r.percent >= 90 ? "Excellent — you're ready!"
+    : r.percent >= 70 ? "Strong — review the misses below."
+    : "Keep going — read the word list, then try again.";
+  app.innerHTML = `
+    <div class="card score-hero">
+      <div class="score-big mono" style="color:${r.percent >= 90 ? "var(--good)" : r.percent >= 70 ? "var(--accent)" : "var(--bad)"}">${r.right}/${r.total}</div>
+      <div class="score-msg">${msg}</div>
+      <div class="score-sub">${r.percent}% · ${esc(state.scopeLabel)} · saved to history</div>
+      <div class="btn-row">
+        <button class="btn" id="studyBtn">Word list</button>
+        <button class="btn btn-primary" id="againBtn">Go again</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 style="font-size:20px">${r.misses.length ? "What you missed" : "Clean sheet"}</h2>
+      ${missListHTML(r.misses)}
+    </div>`;
+  document.getElementById("againBtn").addEventListener("click", () => go("home"));
+  document.getElementById("studyBtn").addEventListener("click", () => go("study"));
+  if (r.percent >= 90) confetti();
+}
+
+function renderHistory() {
+  const h = loadHistory().slice().reverse();
+  const missCount = {};
+  h.forEach(r => (r.misses || []).forEach(m => {
+    const k = String(m.q);
+    missCount[k] = (missCount[k] || 0) + 1;
+  }));
+  const worst = Object.entries(missCount).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const maxMiss = worst.length ? worst[0][1] : 1;
+
+  const rows = h.map(r => {
+    const d = new Date(r.date);
+    const date = d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    const sc = scopeFromTotal(r.total);
+    return `<details class="hrow">
+        <summary>
+          <div class="hdate">${date}<small>${time}</small></div>
+          ${sc ? `<span class="hscope">${sc}</span>` : ""}
+          <span class="hscore">${r.right}/${r.total}</span>
+          <span class="hpct ${pctClass(r.percent)}">${r.percent}%</span>
+        </summary>
+        <div class="hdetail">${missListHTML(r.misses || [])}</div>
+      </details>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="card">
+      <h2 style="font-size:22px">Round history</h2>
+      <p style="color:var(--muted);font-size:14px;margin:6px 0 4px">Tap a round to see exactly what was missed.</p>
+      ${h.length ? rows : `<div class="empty">No rounds yet — take your first one!</div>`}
+    </div>
+    ${worst.length ? `<div class="card trouble"><h2 style="font-size:22px">Trouble words</h2>
+      <p style="color:var(--muted);font-size:14px;margin:6px 0 10px">Missed most often — drill these before the test.</p>
+      ${worst.map(([qq, nn]) =>
+        `<div class="tlabel"><span style="max-width:75%">${esc(qq)}</span><span class="mono">${nn}×</span></div>
+         <div class="tbar"><div style="width:${(nn / maxMiss) * 100}%"></div></div>`).join("")}</div>` : ""}
+    <div class="btn-row"><button class="btn btn-primary btn-wide" id="startBtn">Quiz Section 2</button></div>
+    ${h.length ? `<div class="btn-row"><button class="btn btn-danger btn-wide" id="clearBtn">Clear history</button></div>` : ""}
+    <p class="footnote">${apiSynced
+      ? "Scores sync — open this same link on any phone or computer to see them."
+      : "History is saved on this device."}</p>`;
+
+  document.getElementById("startBtn").addEventListener("click", () => startQuiz("s2"));
+  const clearBtn = document.getElementById("clearBtn");
+  if (clearBtn) clearBtn.addEventListener("click", () => {
+    if (confirm("Delete all saved scores? This can't be undone.")) { clearHistory(); render(); }
+  });
+}
+
+function renderStudy() {
+  app.innerHTML = `
+    <div class="card study">
+      <h2 style="font-size:22px;margin-bottom:4px">The word list</h2>
+      ${SECTIONS.map(sec => `
+        <h3>${esc(sec.name)}</h3>
+        ${sec.terms.map(t => `
+          <div class="word">
+            <div class="wt">${esc(t.t)}</div>
+            <div class="wd">${esc(t.d)}</div>
+            <div class="wn"><b>Remember:</b> ${esc(t.n)}</div>
+          </div>`).join("")}
+      `).join("")}
+      <div class="btn-row"><button class="btn btn-primary btn-wide" id="startBtn">I'm ready — quiz Section 2</button></div>
+    </div>`;
+  document.getElementById("startBtn").addEventListener("click", () => startQuiz("s2"));
+}
+
+/* ================= confetti ================= */
+function confetti() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = document.getElementById("confetti");
+  cv.hidden = false;
+  cv.width = innerWidth; cv.height = innerHeight;
+  const ctx = cv.getContext("2d");
+  const colors = ["#4F46E5", "#8B93F8", "#1E8A4C", "#D97706", "#E05EA8"];
+  const bits = Array.from({ length: 120 }, () => ({
+    x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * 0.5,
+    vy: 2 + Math.random() * 3, vx: -1 + Math.random() * 2,
+    s: 5 + Math.random() * 6, r: Math.random() * Math.PI, vr: -0.1 + Math.random() * 0.2,
+    col: colors[Math.floor(Math.random() * colors.length)],
+  }));
+  let frames = 0;
+  (function loop() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (const b of bits) {
+      b.x += b.vx; b.y += b.vy; b.r += b.vr;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+      ctx.fillStyle = b.col; ctx.fillRect(-b.s / 2, -b.s / 2, b.s, b.s * 0.6);
+      ctx.restore();
+    }
+    if (++frames < 220) requestAnimationFrame(loop);
+    else { ctx.clearRect(0, 0, cv.width, cv.height); cv.hidden = true; }
+  })();
+}
+
+render();
+syncApi();
+</script>
+</body>
+</html>
